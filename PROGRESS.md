@@ -14,7 +14,7 @@
 - [x] Adım 0 — Ortam hazırlığı (Node.js, VS Code, Claude Code)
 - [x] Adım 1 — Boş Next.js 14 + Tailwind v3 + TypeScript kurulumu
 - [x] Adım 1.5 — localhost:3000'de varsayılan sayfa çalışıyor
-- [ ] Adım 2 — Tasarım kararları (renk paleti, bölüm seçimi, brand voice)
+- [x] Adım 2 — globals.css + layout.tsx (krem bg, Inter font, metadata)
 - [ ] Adım 3 — Hero section (statik, animasyonsuz)
 - [ ] Adım 4 — Framer Motion kurulumu + ilk animasyon
 - [ ] Adım 5 — Diğer landing page bölümleri (özellikler, nasıl çalışır, fiyatlandırma)

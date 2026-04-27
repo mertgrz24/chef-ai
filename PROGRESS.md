@@ -5,8 +5,8 @@
 ## 📍 Şu an neredeyiz?
 
 **Aktif Faz:** Phase 1 — Landing Page  
-**Aktif Mikro-Adım:** Adım 1 (Boş Next.js Kurulumu) ✅ TAMAM. Sıradaki: Landing page tasarım kararları.  
-**Son güncelleme:** 26 Nisan 2026
+**Aktif Mikro-Adım:** Adım 5 — Özellik kartları  
+**Son güncelleme:** 27 Nisan 2026
 
 ## 🗺️ Genel Yol Haritası
 
@@ -15,9 +15,9 @@
 - [x] Adım 1 — Boş Next.js 14 + Tailwind v3 + TypeScript kurulumu
 - [x] Adım 1.5 — localhost:3000'de varsayılan sayfa çalışıyor
 - [x] Adım 2 — globals.css + layout.tsx (krem bg, Inter font, metadata)
-- [ ] Adım 3 — Hero section (statik, animasyonsuz)
-- [ ] Adım 4 — Framer Motion kurulumu + ilk animasyon
-- [ ] Adım 5 — Diğer landing page bölümleri (özellikler, nasıl çalışır, fiyatlandırma)
+- [x] Adım 3 — Navbar (logo, masaüstü nav, hamburger menü, fade-in)
+- [x] Adım 4 — Hero section (iki kolon, telefon mockup, staggered animasyon)
+- [ ] Adım 5 — Özellik kartları (features section)
 - [ ] Adım 6 — Animasyon cilası (scroll, hover, micro-interactions)
 - [ ] Adım 7 — Vercel'e deploy + canlı URL
 

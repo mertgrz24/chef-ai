@@ -5,7 +5,7 @@
 ## 📍 Şu an neredeyiz?
 
 **Aktif Faz:** Phase 1 — Landing Page  
-**Aktif Mikro-Adım:** Adım 7 ✅ TAMAM — Landing page tüm bölümleri tamamlandı. Sıradaki: Vercel deploy.  
+**Aktif Mikro-Adım:** Adım 8 — Vercel Deploy  
 **Son güncelleme:** 27 Nisan 2026
 
 ## 🗺️ Genel Yol Haritası

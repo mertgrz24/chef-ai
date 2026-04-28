@@ -5,9 +5,10 @@
 ## 📍 Şu an neredeyiz?
 
 **Aktif Faz:** Phase 2 — Auth & Pantry UI  
-**Aktif Mikro-Adım:** Supabase kurulumu  
-**Son güncelleme:** 28 Nisan 2026  
-**Canlı URL:** https://chef-ai-puce-zeta.vercel.app
+**Aktif Mikro-Adım:** Supabase auth test — signup/login çalışıyor mu doğrulanacak  
+**Son güncelleme:** 29 Nisan 2026  
+**Canlı URL:** https://chef-ai-puce-zeta.vercel.app  
+**⚠️ Açık Sorun:** Load failed hatası — muhtemelen Supabase key formatı veya internet bağlantısı. Yarın test edilecek.
 
 ## 🗺️ Genel Yol Haritası
 

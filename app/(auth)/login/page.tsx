@@ -3,14 +3,31 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    console.log('Login attempt:', { email, password })
+    setError(null)
+    setLoading(true)
+
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+
+    router.push('/dashboard')
   }
 
   return (
@@ -50,12 +67,17 @@ export default function LoginPage() {
           />
         </div>
 
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
+
         <button
           type="submit"
-          className="mt-2 w-full rounded-xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98]"
+          disabled={loading}
+          className="mt-2 w-full rounded-xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
           style={{ backgroundColor: '#ffa51f' }}
         >
-          Giriş Yap
+          {loading ? 'Giriş yapılıyor…' : 'Giriş Yap'}
         </button>
       </form>
 

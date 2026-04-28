@@ -3,15 +3,56 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    console.log('Signup attempt:', { email, password, confirmPassword })
+    setError(null)
+
+    if (password !== confirmPassword) {
+      setError('Şifreler eşleşmiyor.')
+      return
+    }
+
+    setLoading(true)
+    const supabase = createClient()
+    const { error } = await supabase.auth.signUp({ email, password })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+
+    setSuccess(true)
+    setLoading(false)
+  }
+
+  if (success) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-sm text-center"
+        style={{ borderColor: '#ebebeb' }}
+      >
+        <div className="mb-4 text-4xl">📬</div>
+        <h2 className="mb-2 text-xl font-bold text-gray-900">E-postanızı onaylayın</h2>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium text-gray-700">{email}</span> adresine bir doğrulama
+          bağlantısı gönderdik. Lütfen e-postanızı kontrol edin.
+        </p>
+      </motion.div>
+    )
   }
 
   return (
@@ -63,12 +104,17 @@ export default function SignupPage() {
           />
         </div>
 
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
+
         <button
           type="submit"
-          className="mt-2 w-full rounded-xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98]"
+          disabled={loading}
+          className="mt-2 w-full rounded-xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
           style={{ backgroundColor: '#ffa51f' }}
         >
-          Üye Ol
+          {loading ? 'Hesap oluşturuluyor…' : 'Üye Ol'}
         </button>
       </form>
 

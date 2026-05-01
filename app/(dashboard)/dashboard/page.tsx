@@ -13,13 +13,11 @@ export default async function DashboardPage() {
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const threeDaysLater = new Date(today)
-  threeDaysLater.setDate(today.getDate() + 3)
 
   const pantryCount = pantryItems?.length ?? 0
   const wasteAlertCount = pantryItems?.filter((item) => {
     const expiry = new Date(item.expiry_date)
-    return expiry <= threeDaysLater
+    return expiry <= today
   }).length ?? 0
 
   const stats = [

@@ -108,7 +108,6 @@ export function PhotoAnalyzer() {
         id="photo-input"
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        capture="environment"
         onChange={handleFileChange}
         className="sr-only"
       />

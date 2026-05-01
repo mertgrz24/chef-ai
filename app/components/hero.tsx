@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import Link from "next/link";
 
 const container: Variants = {
   hidden: {},
@@ -181,13 +182,13 @@ export function Hero() {
 
           {/* Buttons */}
           <motion.div variants={item} className="flex flex-col sm:flex-row gap-3">
-            <a
-              href="#"
+            <Link
+              href="/signup"
               className="text-center px-7 py-3 rounded-full text-sm font-medium transition-opacity hover:opacity-85"
               style={{ backgroundColor: "#ffa51f", color: "#ffffff" }}
             >
               Ücretsiz Başla →
-            </a>
+            </Link>
             <a
               href="#nasil-calisir"
               className="text-center px-7 py-3 rounded-full text-sm font-medium transition-colors text-white md:text-[#1a1a1a] hover:bg-white/5 md:hover:bg-black/5"

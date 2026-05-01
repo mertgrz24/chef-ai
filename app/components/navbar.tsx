@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,13 +38,20 @@ export function Navbar() {
           >
             Fiyatlar
           </a>
-          <a
-            href="#"
+          <Link
+            href="/login"
+            className="text-sm transition-colors hover:text-[#1a1a1a]"
+            style={{ color: "#888888" }}
+          >
+            Giriş Yap
+          </Link>
+          <Link
+            href="/signup"
             className="text-sm px-5 py-2 rounded-full transition-opacity hover:opacity-80"
             style={{ backgroundColor: "#1a1a1a", color: "#ffffff" }}
           >
             Ücretsiz Başla
-          </a>
+          </Link>
         </nav>
 
         {/* Mobile hamburger */}
@@ -81,13 +89,20 @@ export function Navbar() {
           >
             Fiyatlar
           </a>
-          <a
-            href="#"
+          <Link
+            href="/login"
+            className="text-sm py-2 transition-colors hover:text-[#1a1a1a]"
+            style={{ color: "#888888" }}
+          >
+            Giriş Yap
+          </Link>
+          <Link
+            href="/signup"
             className="text-sm mt-1 px-5 py-2.5 rounded-full text-center transition-opacity hover:opacity-80"
             style={{ backgroundColor: "#1a1a1a", color: "#ffffff" }}
           >
             Ücretsiz Başla
-          </a>
+          </Link>
         </motion.div>
       )}
     </motion.header>

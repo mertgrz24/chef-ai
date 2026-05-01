@@ -149,4 +149,27 @@ Claude Code, bir görevi tamamladığını söylemeden önce:
 
 ---
 
+## 11. Product Vision
+
+**Pozisyon:** Yemek karar motoru — tarif uygulaması değil.  
+**Slogan:** "Elindekilerle ne yapacağını söyleyen sistem."  
+**Hedef Kitle:** Türkiye'deki öğrenciler ve genç profesyoneller.
+
+### Versiyon Yol Haritası
+
+| Versiyon | Kapsam |
+|----------|--------|
+| **V1 (Mevcut)** | Malzeme girişi + fotoğraf tanıma + tarif üretme + israf takibi |
+| **V2** | Haftalık yemek planı + diyet hedefleri + kalori tahmini |
+| **V3** | Kişiselleştirilmiş öneriler + davranış öğrenme |
+| **V4** | Market entegrasyonu (A101, BİM, Migros) + fiyat optimizasyonu |
+
+### Büyüme & Gelir
+
+- **Viral mekanizma:** Paylaşılabilir tarif kartları
+- **Ana KPI:** Günlük geri dönüş oranı
+- **Gelir modeli:** Freemium (günlük 3 tarif) → ilerleyen dönemde market affiliate
+
+---
+
 _Bu dosya proje büyüdükçe güncellenecektir. Yeni kural eklerken önce eski kuralla çelişip çelişmediğini kontrol et._

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import Link from "next/link";
 
 const container: Variants = {
   hidden: {},
@@ -89,13 +90,13 @@ export function Pricing() {
                 </li>
               ))}
             </ul>
-            <a
-              href="#"
+            <Link
+              href="/signup"
               className="text-center py-3 rounded-full text-sm font-medium transition-colors hover:bg-[#f5f5f0]"
               style={{ border: "1.5px solid #1a1a1a", color: "#1a1a1a" }}
             >
               Hemen Başla
-            </a>
+            </Link>
           </motion.div>
 
           {/* Premium plan */}
@@ -137,13 +138,13 @@ export function Pricing() {
                 </li>
               ))}
             </ul>
-            <a
-              href="#"
+            <Link
+              href="/signup"
               className="text-center py-3 rounded-full text-sm font-medium transition-opacity hover:opacity-85"
               style={{ backgroundColor: "#ffa51f", color: "#1a1a1a" }}
             >
               Premium{"'"}a Geç →
-            </a>
+            </Link>
           </motion.div>
         </motion.div>
       </div>

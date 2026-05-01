@@ -4,8 +4,8 @@
 
 ## 📍 Şu an neredeyiz?
 
-**Aktif Faz:** Phase 7 — Launch  
-**Aktif Mikro-Adım:** Vercel deploy ve lansman  
+**Aktif Faz:** V2 — Haftalık Yemek Planı  
+**Aktif Mikro-Adım:** Planlama başlamadı — ilk mikro-adım belirleniyor  
 **Son güncelleme:** 1 Mayıs 2026  
 **Canlı URL:** https://chef-ai-puce-zeta.vercel.app
 
@@ -56,11 +56,22 @@
 - [x] Dashboard stats gerçek veriye bağlandı — kiler sayısı + israf uyarısı sayısı
 - [x] Placeholder sayfalar oluşturuldu — /pantry /recipes /profile
 
-### Phase 7 — Launch (Hafta 7)
-- [ ] Production Vercel deploy ← **şu an burada**
-- [ ] Environment variables Vercel'e taşı (ANTHROPIC_API_KEY, GEMINI_API_KEY, Supabase keys)
-- [ ] Domain bağlama
-- [ ] Sosyal medya lansmanı
+### Phase 7 — Launch ✅ TAMAMLANDI (Hafta 7)
+- [x] Production Vercel deploy — canlıda ✅
+- [x] Environment variables Vercel'e taşındı
+- [x] PWA kurulumu — manifest, icon, apple-icon, service worker
+- [x] Telefona "Ana Ekrana Ekle" çalışıyor
+- [x] Kamera + galeri seçimi (capture attribute kaldırıldı)
+
+---
+
+## 🚀 V2 — Haftalık Yemek Planı
+
+### V2 Kapsam
+- [ ] Paylaşılabilir tarif kartları (viral mekanizma)
+- [ ] Haftalık yemek planı oluşturma
+- [ ] Diyet hedefleri (kalori, protein, vb.)
+- [ ] Kalori tahmini (Claude ile)
 
 ## 🎯 Önemli Kararlar (kronolojik)
 
@@ -81,7 +92,16 @@ Yeni bir Claude Code konuşması açtığında şunu yapıştır:
 
 > Chef-AI projesindeyim. Lütfen önce CLAUDE.md ve PROGRESS.md dosyalarını oku, sonra bana iki cümleyle özetle: nerede kaldık, sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
 
+**V2 için başlangıç önerisi:** Paylaşılabilir tarif kartları — en yüksek viral potansiyel, teknik karmaşıklığı düşük.
+
 ## 📝 Seans Notları
+
+### 1 Mayıs 2026 — Phase 7 tamamlandı — V1 COMPLETE 🎉
+- Vercel deploy canlı: https://chef-ai-puce-zeta.vercel.app
+- PWA: manifest.ts, icon.tsx, apple-icon.tsx, sw.js (cache-first static / network-first pages)
+- iOS + Android "Ana Ekrana Ekle" çalışıyor
+- `capture` attribute kaldırıldı — kamera ve galeri seçimi aktif
+- Tüm V1 fazları tamamlandı (Phase 1-7)
 
 ### 1 Mayıs 2026 — Phase 6 tamamlandı
 - Supabase `pantry` tablosu + RLS kuruldu (SQL Editor ile manuel)

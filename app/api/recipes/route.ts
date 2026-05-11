@@ -1,37 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-// MOCK: Gerçek API'ye geçmek için aşağıdaki import'u uncomment et,
-// mockGenerateRecipe çağrısını generateRecipe ile değiştir ve MOCK bloğunu sil.
-// import { generateRecipe } from '@/lib/ai/claude'
+import { generateRecipeWithGemini } from '@/lib/ai/gemini'
 
-// ─── MOCK BAŞLANGICI ──────────────────────────────────────────────────────────
-function buildMockRecipe(ingredients: string[]): string {
-  const list = ingredients.join(', ')
-  return `🍽️ ${ingredients[0].charAt(0).toUpperCase() + ingredients[0].slice(1)} Sote
-
-📝 Malzemeler
-• ${ingredients.map((i) => `${i} (yeterince)`).join('\n• ')}
-• Tuz, karabiber
-• 2 yemek kaşığı zeytinyağı
-
-👨‍🍳 Hazırlık Adımları
-1. ${ingredients[0].charAt(0).toUpperCase() + ingredients[0].slice(1)}'ı küçük parçalara kesin.
-2. Tavayı orta ateşte ısıtın, zeytinyağını ekleyin.
-3. ${ingredients.length > 1 ? ingredients[1] : ingredients[0]}'ı 2-3 dakika kavurun.
-4. Kalan malzemeleri (${list}) ekleyip 5 dakika daha pişirin.
-5. Tuz ve karabiber ile tatlandırın.
-6. Sıcak servis yapın. Afiyet olsun! 🎉
-
-⏱️ Tahmini Süre: 20 dakika
-💪 Zorluk: Kolay`
+type ProfileRow = {
+  daily_calorie_goal: number | null
+  protein_goal_g: number | null
+  carbs_goal_g: number | null
+  fat_goal_g: number | null
+  water_goal_l: number | null
+  diet_type: string | null
 }
 
-async function mockGenerateRecipe(ingredients: string[]): Promise<{ text: string }> {
-  // Yapay gecikme: gerçek API çağrısını simüle eder (2-3 sn)
-  await new Promise((resolve) => setTimeout(resolve, 2000 + Math.random() * 1000))
-  return { text: buildMockRecipe(ingredients) }
+function buildDietContext(profile: ProfileRow | null): string | undefined {
+  if (!profile) return undefined
+  const parts: string[] = []
+  if (profile.daily_calorie_goal) parts.push(`günlük kalori ${profile.daily_calorie_goal} kcal`)
+  if (profile.protein_goal_g) parts.push(`protein ${profile.protein_goal_g}g`)
+  if (profile.carbs_goal_g) parts.push(`karbonhidrat ${profile.carbs_goal_g}g`)
+  if (profile.fat_goal_g) parts.push(`yağ ${profile.fat_goal_g}g`)
+  if (profile.water_goal_l) parts.push(`su ${profile.water_goal_l} litre`)
+  if (profile.diet_type) parts.push(`diyet tipi: ${profile.diet_type}`)
+  if (parts.length === 0) return undefined
+  return `Diyet hedeflerim: ${parts.join(', ')}. Bu hedeflere uygun tarif öner.`
 }
-// ─── MOCK SONU ────────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
   // 1. Parse body
@@ -62,13 +53,20 @@ export async function POST(request: NextRequest) {
   }
 
   // TODO: Rate limiting — günlük 3 tarif (ücretsiz) kontrolü
-  // Supabase'de recipe_logs tablosu kurulunca buraya eklenecek.
 
-  // 3. Generate recipe
-  // MOCK: mockGenerateRecipe → generateRecipe olarak değiştir (Claude API geçişi)
+  // 3. Fetch diet profile for context (non-fatal if unavailable)
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('daily_calorie_goal, protein_goal_g, carbs_goal_g, fat_goal_g, water_goal_l, diet_type')
+    .eq('id', user.id)
+    .single()
+
+  const dietContext = buildDietContext(profileData as ProfileRow | null)
+
+  // 4. Generate recipe with Gemini
   try {
-    const result = await mockGenerateRecipe(ingredients)
-    return NextResponse.json({ recipe: result.text })
+    const result = await generateRecipeWithGemini(ingredients, dietContext)
+    return NextResponse.json({ recipe: result.text, macros: result.macros })
   } catch (err) {
     console.error('[/api/recipes] Tarif üretme hatası:', err)
     return NextResponse.json(

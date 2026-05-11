@@ -4,9 +4,9 @@
 
 ## 📍 Şu an neredeyiz?
 
-**Aktif Faz:** V2 — Haftalık Yemek Planı  
-**Aktif Mikro-Adım:** Planlama başlamadı — ilk mikro-adım belirleniyor  
-**Son güncelleme:** 1 Mayıs 2026  
+**Aktif Faz:** V2.2 — Paylaşılabilir Tarif Kartları ✅ TAMAMLANDI  
+**Aktif Mikro-Adım:** Sonraki: V2.3 — Haftalık Yemek Planı  
+**Son güncelleme:** 11 Mayıs 2026  
 **Canlı URL:** https://chef-ai-puce-zeta.vercel.app
 
 ## 🗺️ Genel Yol Haritası
@@ -67,10 +67,30 @@
 
 ## 🚀 V2 — Haftalık Yemek Planı
 
-### V2 Kapsam
+### V2.1 — Diyet Hedefleri (Aktif)
+- [x] **A1** — `profiles` tablosu oluşturuldu (email, full_name + 10 diyet alanı, RLS, trigger) ✅
+- [x] **A2.1** — `GET /api/profile` + `PUT /api/profile` endpoint'leri (auth, validasyon, RLS) ✅
+- [x] **A2.2** — `/profile` sayfasında diyet hedefi formu (UI) ✅
+- [x] **A2.3** — Dashboard'a "Tüketim Tarihi Geçmiş" kutusu (kırmızı, koşullu, /pantry linki) ✅
+- [x] **A3.1** — Claude JSON çıktısı + makro tahmini + diyet hedefi prompt entegrasyonu ✅
+- [x] **A3.2** — Dashboard "Hedeflerim" paneli (null-filtreli goal kartları, boşsa link) ✅
+- [ ] **A4** — Dashboard'da hedef göstergesi (ilerleme çubukları)
+
+### V2.2 — Paylaşılabilir Tarif Kartları (Aktif)
+- [ ] **B1** — `recipes` Supabase tablosu (SQL: id, user_id, name, ingredients[], instructions, macros jsonb, diet_context, is_public, created_at) + RLS
+- [x] **B2** — Tarif kaydetme ve paylaşım API endpoint'leri ✅
+  - `types/recipe.ts` — `Recipe`, `RecipeMacros` tipleri
+  - `POST /api/recipes/save` — auth + validasyon + insert, 201
+  - `GET /api/recipes/history` — auth + user tarifleri, limit 20, DESC
+  - `GET /api/recipes/[id]` — public, is_public kontrolü, 404 guard
+- [x] **B3** — Tarif kaydet & paylaş UI + public tarif sayfası ✅
+  - `RecipeGenerator`: "🔗 Kaydet & Paylaş" butonu, Web Share API / clipboard fallback, `parseFormattedRecipe` helper
+  - `app/recipe/[id]/page.tsx`: public sayfa, auth yok, malzeme+adım+makro, "Sen de dene →" CTA
+  - `dashboard/page.tsx`: "Geçmiş Tariflerim" son 5 tarif listesi, "Kayıtlı tarif" stat gerçek sayı
+
+### V2 Kapsam (Genel)
 - [ ] Paylaşılabilir tarif kartları (viral mekanizma)
 - [ ] Haftalık yemek planı oluşturma
-- [ ] Diyet hedefleri (kalori, protein, vb.)
 - [ ] Kalori tahmini (Claude ile)
 
 ## 🎯 Önemli Kararlar (kronolojik)
@@ -90,11 +110,73 @@
 
 Yeni bir Claude Code konuşması açtığında şunu yapıştır:
 
-> Chef-AI projesindeyim. Lütfen önce CLAUDE.md ve PROGRESS.md dosyalarını oku, sonra bana iki cümleyle özetle: nerede kaldık, sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
-
-**V2 için başlangıç önerisi:** Paylaşılabilir tarif kartları — en yüksek viral potansiyel, teknik karmaşıklığı düşük.
+> Chef-AI V2 projesindeyim. CLAUDE.md ve PROGRESS.md'yi oku, iki cümleyle özetle: nerede kaldık, sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
 
 ## 📝 Seans Notları
+
+### 11 Mayıs 2026 — V2.2 B3 tamamlandı — V2.2 COMPLETE
+- `components/dashboard/recipe-generator.tsx`: `parseFormattedRecipe` helper; `parsedRecipe`, `savedRecipeId`, `saving`, `shareMessage`, `saveError` state; `handleSave` → POST /api/recipes/save; `triggerShare` → Web Share API önce, `AbortError` ignore, clipboard fallback; "🔗 Tekrar Paylaş" idempotent
+- `app/recipe/[id]/page.tsx`: server component, Supabase doğrudan sorgu, `notFound()` guard, malzeme bullet listesi, `whitespace-pre-wrap` talimatlar, makro satırı (amber bg), "Sen de dene →" CTA
+- `app/(dashboard)/dashboard/page.tsx`: Promise.all'a recipes count + 5 recent sorguları eklendi; "Kayıtlı tarif" stat artık gerçek; "📋 Geçmiş Tariflerim" bölümü isim+tarih+paylaş linki; `formatDate` helper; `RecentRecipe` tipi
+- ⚠️ Public recipe sayfası için Supabase'de "anyone can read public recipes" RLS policy gerekiyor (bkz. test talimatı)
+
+### 11 Mayıs 2026 — V2.2 B2 tamamlandı
+- `types/recipe.ts` oluşturuldu: `Recipe` + `RecipeMacros` interface'leri
+- `POST /api/recipes/save`: auth, name+ingredients+instructions zorunlu validasyon, is_public=true insert, 201 + kayıtlı satır
+- `GET /api/recipes/history`: auth, user_id filtreli, created_at DESC, limit 20
+- `GET /api/recipes/[id]`: public endpoint, PGRST116 → 404, is_public=false → 404
+- Mevcut `app/api/recipes/route.ts` dokunulmadı
+- **Not:** `recipes` Supabase tablosu henüz oluşturulmadı — B1 için SQL gerekiyor
+- lint: 0 error, typecheck: 0 error
+
+### 11 Mayıs 2026 — Tarif üretimi Claude → Gemini'ye taşındı
+- `lib/ai/gemini.ts`: `RecipeMacros`, `RecipeResult`, `RECIPE_SYSTEM_PROMPT`, `parseRecipeJson`, `generateRecipeWithGemini(ingredients, dietContext?)` eklendi; `analyzeIngredients`'a dokunulmadı
+- `app/api/recipes/route.ts`: Claude importları kaldırıldı; `generateRecipeWithGemini` + local `buildDietContext` helper kullanılıyor; mantık (auth, validasyon, profil fetch) aynı
+- `lib/ai/claude.ts`: değiştirilmedi (ileride başka amaçla kullanılabilir)
+- GEMINI_API_KEY .env.local'da mevcut ✅
+
+### 11 Mayıs 2026 — V2.1 A3 tamamlandı
+**A3.1 — Tarif motoru:**
+- `lib/ai/claude.ts`: System prompt JSON çıktısı istiyor; `RecipeMacros`, `ProfileContext`, `RecipeResult` (macros dahil) tipleri eklendi; `buildDietBlock` + `parseRecipeJson` helper'ları; `generateRecipe(ingredients, profile?)` imzası güncellendi; code fence strip fallback var
+- `app/api/recipes/route.ts`: Mock tamamen kaldırıldı; gerçek Claude API; tarif öncesi Supabase'den profil çekiliyor, `ProfileContext` olarak `generateRecipe`'ye geçiliyor; `{ recipe, macros }` dönüyor
+- `components/dashboard/recipe-generator.tsx`: `macros` state eklendi; tarif kartı altına 🔥💪🍚🧈 satırı; "Yeni tarif üret" macros'u da sıfırlıyor
+
+**A3.2 — Dashboard Hedeflerim paneli:**
+- `app/(dashboard)/dashboard/page.tsx`: Profil Promise.all ile pantry ile paralel çekiliyor; null-filtreli `goalItems` dizisi; grid `2/3/4/5 col` responsive; boşsa dashed border + "Hedeflerini belirle →" linki; "Düzenle →" header linki
+- `dietLabel()` helper: DB değerlerini Türkçe etikete çeviriyor
+- lint: 0 error, typecheck: 0 error
+
+### 11 Mayıs 2026 — V2.1 A2.3 tamamlandı
+- `app/(dashboard)/dashboard/page.tsx`: `expiredCount` hesabı eklendi (`expiry < today`, dün veya öncesi)
+- Dashboard stat grid'i `sm:grid-cols-3` → `sm:grid-cols-2 lg:grid-cols-4`'e güncellendi
+- `expiredCount > 0` olduğunda kırmızı `🗑️` kartı render ediliyor, tıklanınca `/pantry`'ye yönlendiriyor
+- `import Link` eklendi; lint: 0 error, typecheck: 0 error
+- Semantik ayrım: `wasteAlertCount` (≤ today, bugün dahil) vs `expiredCount` (< today, dün veya öncesi)
+
+### 11 Mayıs 2026 — V2.1 A2.2 tamamlandı
+- `app/(dashboard)/profile/page.tsx` tamamen yeniden yazıldı (placeholder → çalışan form)
+- 4 bölümlü form: Beslenme Hedefleri / Aktivite / Kilo Takibi / Diyet Tercihi
+- Sayfa açılınca GET /api/profile ile değerleri çekiyor, forma dolduruyor
+- "Diğer" diyet tipi seçilince text input açılıyor
+- Kaydet → PUT /api/profile, başarı/hata mesajı gösteriyor
+- Loading ve hata state'leri mevcut; buton kayıt sırasında disabled
+- Framer Motion fade-up (delay stagger, 0.25s, easeOut) ile 4 bölüm
+- Yeni paket eklenmedi; lint: 0 error, typecheck: 0 error
+
+### 11 Mayıs 2026 — V2.1 A2.1 tamamlandı
+- `app/api/profile/route.ts` oluşturuldu (GET + PUT)
+- GET: auth kontrolü → `profiles` tablosundan satır çek → 200/401/404/500
+- PUT: izin verilen 10 alan, sayısal alanlar null|pozitif kontrol, `id/email/created_at` yok sayılır, `goals_updated_at` + `updated_at` her güncellemede set edilir
+- `types/profile.ts`'e `ProfileUpdatePayload` tipi eklendi
+- lint: 0 error, typecheck: 0 error
+
+### 4 Mayıs 2026 — V2.1 A1 tamamlandı
+- `profiles` tablosu yoktu, sıfırdan oluşturuldu
+- 14 kolon: id, email, full_name, 10 diyet alanı, created_at, updated_at
+- RLS politikaları + signup trigger kuruldu
+- Mevcut kullanıcı (1 hesap) otomatik migrate edildi
+- Eski migration dosyası silindi, referans dosyası oluşturuldu
+- `types/profile.ts` güncellendi
 
 ### 1 Mayıs 2026 — Phase 7 tamamlandı — V1 COMPLETE 🎉
 - Vercel deploy canlı: https://chef-ai-puce-zeta.vercel.app

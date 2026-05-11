@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { RecipeMacros } from '@/types/recipe'
 
@@ -32,6 +33,7 @@ function parseFormattedRecipe(text: string): ParsedRecipe | null {
 }
 
 export function RecipeGenerator() {
+  const router = useRouter()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [recipe, setRecipe] = useState<string | null>(null)
@@ -135,6 +137,7 @@ export function RecipeGenerator() {
         setSaveError(data.error ?? 'Kaydetme başarısız.')
       } else if (data.recipe?.id) {
         setSavedRecipeId(data.recipe.id)
+        router.refresh() // re-render dashboard server component (history + count)
         await triggerShare(data.recipe.id)
       }
     } catch {

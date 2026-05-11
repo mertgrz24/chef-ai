@@ -3,6 +3,15 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Recipe } from '@/types/recipe'
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('tr-TR', {
+    timeZone: 'Europe/Istanbul',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+}
+
 export default async function PublicRecipePage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
 
@@ -25,8 +34,8 @@ export default async function PublicRecipePage({ params }: { params: { id: strin
           <Link href="/" className="text-xl font-bold" style={{ color: '#ffa51f' }}>
             ChefAI
           </Link>
-          <Link href="/" className="text-sm text-gray-500 transition hover:text-gray-700">
-            ← Anasayfa
+          <Link href="/dashboard" className="text-sm text-gray-500 transition hover:text-gray-700">
+            ← Dashboard
           </Link>
         </div>
       </header>
@@ -34,7 +43,8 @@ export default async function PublicRecipePage({ params }: { params: { id: strin
       {/* Content */}
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <h1 className="mb-6 text-2xl font-bold text-gray-900">{recipe.name}</h1>
+          <h1 className="mb-1 text-2xl font-bold text-gray-900">{recipe.name}</h1>
+          <p className="mb-6 text-xs text-gray-400">{formatDate(recipe.created_at)}</p>
 
           {/* Ingredients */}
           <div className="mb-6">

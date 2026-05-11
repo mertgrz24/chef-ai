@@ -8,8 +8,9 @@ type RecentRecipe = { id: string; name: string; created_at: string }
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('tr-TR', {
-    day: 'numeric',
-    month: 'long',
+    timeZone: 'Europe/Istanbul',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
   })
 }

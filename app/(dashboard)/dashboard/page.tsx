@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PhotoAnalyzer } from '@/components/dashboard/photo-analyzer'
 import { RecipeGenerator } from '@/components/dashboard/recipe-generator'
 import type { Profile } from '@/types/profile'
+import type { MealPlanDay } from '@/types/meal-plan'
 
 type RecentRecipe = { id: string; name: string; created_at: string }
 
@@ -29,6 +30,21 @@ function dietLabel(dt: string): string {
   return DIET_LABELS[dt] ?? dt
 }
 
+function getWeekStartDate(): string {
+  const now = new Date()
+  const day = now.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  const monday = new Date(now)
+  monday.setDate(now.getDate() + diff)
+  return monday.toISOString().split('T')[0]
+}
+
+function getTodayDayKey(): string {
+  return new Date()
+    .toLocaleDateString('en-US', { timeZone: 'Europe/Istanbul', weekday: 'long' })
+    .toLowerCase()
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -38,6 +54,7 @@ export default async function DashboardPage() {
     { data: profileData },
     savedCountResult,
     { data: recentData },
+    { data: mealPlanData },
   ] = await Promise.all([
     supabase.from('pantry').select('expiry_date').eq('user_id', user!.id),
     supabase
@@ -52,10 +69,20 @@ export default async function DashboardPage() {
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false })
       .limit(5),
+    supabase
+      .from('meal_plans')
+      .select('meals')
+      .eq('user_id', user!.id)
+      .eq('week_start_date', getWeekStartDate())
+      .single(),
   ])
 
   const savedCount = (savedCountResult.count as number | null) ?? 0
   const recentRecipes = (recentData ?? []) as RecentRecipe[]
+
+  const todayMeal = mealPlanData
+    ? ((mealPlanData.meals as MealPlanDay[]).find((d) => d.day === getTodayDayKey()) ?? null)
+    : null
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -204,6 +231,40 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Bu Haftaki Planın */}
+      <div className="mt-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800">🗓️ Bu Haftaki Planın</h2>
+          <Link href="/meal-plan" className="text-xs text-amber-500 hover:underline">
+            Tüm Planı Gör →
+          </Link>
+        </div>
+
+        {todayMeal ? (
+          <div className="divide-y divide-gray-50 rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div className="flex items-center gap-3 px-5 py-3.5">
+              <span className="text-lg">🌅</span>
+              <span className="w-16 flex-shrink-0 text-xs font-medium text-gray-400">Kahvaltı</span>
+              <span className="text-sm font-medium text-gray-800">{todayMeal.breakfast.name}</span>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-3.5">
+              <span className="text-lg">🌙</span>
+              <span className="w-16 flex-shrink-0 text-xs font-medium text-gray-400">Akşam</span>
+              <span className="text-sm font-medium text-gray-800">{todayMeal.dinner.name}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-6 text-center">
+            <p className="text-sm text-gray-400">
+              Haftalık plan oluşturulmamış.{' '}
+              <Link href="/meal-plan" className="text-amber-500 hover:underline">
+                Haftalık planı oluştur →
+              </Link>
+            </p>
+          </div>
+        )}
+      </div>
 
       <PhotoAnalyzer />
       <RecipeGenerator />

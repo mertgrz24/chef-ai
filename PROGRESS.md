@@ -4,9 +4,9 @@
 
 ## 📍 Şu an neredeyiz?
 
-**Aktif Faz:** V2.2 — Paylaşılabilir Tarif Kartları ✅ TAMAMLANDI  
-**Aktif Mikro-Adım:** Sonraki: V2.3 — Haftalık Yemek Planı  
-**Son güncelleme:** 11 Mayıs 2026  
+**Aktif Faz:** V2.3 — Haftalık Yemek Planı ✅ TAMAMLANDI  
+**Aktif Mikro-Adım:** Sonraki: V2.4 — (belirlenecek)  
+**Son güncelleme:** 12 Mayıs 2026  
 **Canlı URL:** https://chef-ai-puce-zeta.vercel.app
 
 ## 🗺️ Genel Yol Haritası
@@ -74,10 +74,10 @@
 - [x] **A2.3** — Dashboard'a "Tüketim Tarihi Geçmiş" kutusu (kırmızı, koşullu, /pantry linki) ✅
 - [x] **A3.1** — Claude JSON çıktısı + makro tahmini + diyet hedefi prompt entegrasyonu ✅
 - [x] **A3.2** — Dashboard "Hedeflerim" paneli (null-filtreli goal kartları, boşsa link) ✅
-- [ ] **A4** — Dashboard'da hedef göstergesi (ilerleme çubukları)
+- [x] **A4** — Dashboard hedef göstergesi — ilerleme çubuğu yok, hedef değerleri doğrudan kartlarda gösteriliyor ✅
 
-### V2.2 — Paylaşılabilir Tarif Kartları (Aktif)
-- [ ] **B1** — `recipes` Supabase tablosu (SQL: id, user_id, name, ingredients[], instructions, macros jsonb, diet_context, is_public, created_at) + RLS
+### V2.2 — Paylaşılabilir Tarif Kartları ✅ TAMAMLANDI
+- [x] **B1** — `recipes` Supabase tablosu (SQL: id, user_id, name, ingredients[], instructions, macros jsonb, diet_context, is_public, created_at) + RLS ✅
 - [x] **B2** — Tarif kaydetme ve paylaşım API endpoint'leri ✅
   - `types/recipe.ts` — `Recipe`, `RecipeMacros` tipleri
   - `POST /api/recipes/save` — auth + validasyon + insert, 201
@@ -88,8 +88,24 @@
   - `app/recipe/[id]/page.tsx`: public sayfa, auth yok, malzeme+adım+makro, "Sen de dene →" CTA
   - `dashboard/page.tsx`: "Geçmiş Tariflerim" son 5 tarif listesi, "Kayıtlı tarif" stat gerçek sayı
 
+### V2.3 — Haftalık Yemek Planı (Aktif)
+- [x] **C1** — `meal_plans` Supabase tablosu (id, user_id, week_start_date, meals jsonb, created_at, updated_at) + RLS + unique(user_id, week_start_date) ✅
+- [x] **C2** — API endpoint'leri ✅
+  - `types/meal-plan.ts` — `MealItem`, `MealPlanDay`, `MealPlan` tipleri
+  - `lib/ai/gemini.ts` — `generateWeeklyMealPlan(dietContext?)` + `generateSingleMeal(day, mealType, dietContext?)`
+  - `POST /api/meal-plan/generate` — auth + profil çek + Gemini + UPSERT, 201
+  - `GET /api/meal-plan` — auth + bu haftanın planı, 200/404
+  - `PATCH /api/meal-plan/regenerate-day` — auth + body validasyon + tek öğün yenile + UPDATE, 200
+  - typecheck: 0 hata · lint: 0 hata
+- [x] **C3** — Haftalık plan UI ✅
+  - `app/(dashboard)/meal-plan/page.tsx`: yükleme/boş durum/plan görünümü, 🔄 tüm plan yenile, tek öğün yenile (sadece o satır spinner), accordion detay (malzeme + talimat + makro badge)
+  - `app/(dashboard)/layout.tsx`: sidebar'a "🗓️ Yemek Planı" nav linki eklendi
+  - `components/dashboard/mobile-nav.tsx`: mobile menüye "Yemek Planı" eklendi
+  - `app/(dashboard)/dashboard/page.tsx`: "Bu Haftaki Planın" widget'ı — bugünün kahvaltı+akşam öğünü, plan yoksa "oluştur →" linki
+  - typecheck: 0 hata · lint: 0 hata
+
 ### V2 Kapsam (Genel)
-- [ ] Paylaşılabilir tarif kartları (viral mekanizma)
+- [x] Paylaşılabilir tarif kartları (viral mekanizma) ✅
 - [ ] Haftalık yemek planı oluşturma
 - [ ] Kalori tahmini (Claude ile)
 

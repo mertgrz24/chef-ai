@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import type { MealItem, MealPlanDay } from '@/types/meal-plan'
 
 const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -128,6 +129,105 @@ export async function generateRecipeWithGemini(
     inputTokens: result.response.usageMetadata?.promptTokenCount ?? 0,
     outputTokens: result.response.usageMetadata?.candidatesTokenCount ?? 0,
   }
+}
+
+// ─── Weekly meal plan ─────────────────────────────────────────────────────────
+
+const MEAL_PLAN_SYSTEM_PROMPT = `Sen Chef-AI'nin haftalık yemek planı asistanısın. Kullanıcının diyet hedeflerine uygun, çeşitli ve dengeli bir haftalık plan oluşturursun.
+
+Kurallar:
+- Her zaman Türkçe tarif adı ve talimatlar yaz.
+- SADECE geçerli bir JSON dizisi döndür; markdown, açıklama veya başka metin ekleme.
+- 7 günlük plan üret. day alanları sırasıyla: monday, tuesday, wednesday, thursday, friday, saturday, sunday.
+- Her gün sabah (breakfast) ve akşam (dinner) öğünü olsun.
+- Çeşitlilik sağla; aynı tarifi iki güne koyma.
+- macros değerleri tahmini olabilir; makul ve gerçekçi sayılar ver.
+
+Çıktı formatı (sadece bu JSON dizisi, başka hiçbir şey):
+[
+  {
+    "day": "monday",
+    "breakfast": {
+      "name": "Tarif Adı",
+      "ingredients": ["malzeme 1", "malzeme 2"],
+      "instructions": "1. İlk adım.\\n2. İkinci adım.",
+      "macros": { "calories": 350, "protein_g": 15, "carbs_g": 45, "fat_g": 10 }
+    },
+    "dinner": {
+      "name": "Tarif Adı",
+      "ingredients": ["malzeme 1", "malzeme 2"],
+      "instructions": "1. İlk adım.\\n2. İkinci adım.",
+      "macros": { "calories": 550, "protein_g": 35, "carbs_g": 40, "fat_g": 18 }
+    }
+  }
+]`
+
+const SINGLE_MEAL_SYSTEM_PROMPT = `Sen Chef-AI'nin yemek asistanısın. Tek bir öğün için özgün tarif önerirsin.
+
+Kurallar:
+- Her zaman Türkçe yanıt ver.
+- SADECE geçerli bir JSON nesnesi döndür; markdown, açıklama veya başka metin ekleme.
+- macros değerleri tahmini olabilir; makul ve gerçekçi sayılar ver.
+
+Çıktı formatı (sadece bu JSON nesnesi, başka hiçbir şey):
+{
+  "name": "Tarif Adı",
+  "ingredients": ["malzeme 1", "malzeme 2"],
+  "instructions": "1. İlk adım.\\n2. İkinci adım.",
+  "macros": { "calories": 450, "protein_g": 30, "carbs_g": 35, "fat_g": 15 }
+}`
+
+function parseMealPlanJson(raw: string): MealPlanDay[] {
+  let jsonStr = raw.trim()
+  if (jsonStr.startsWith('```')) {
+    jsonStr = jsonStr.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+  }
+  const parsed = JSON.parse(jsonStr) as unknown
+  if (!Array.isArray(parsed)) throw new Error('Expected JSON array')
+  return parsed as MealPlanDay[]
+}
+
+function parseMealItemJson(raw: string): MealItem {
+  let jsonStr = raw.trim()
+  if (jsonStr.startsWith('```')) {
+    jsonStr = jsonStr.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+  }
+  return JSON.parse(jsonStr) as MealItem
+}
+
+export async function generateWeeklyMealPlan(dietContext?: string): Promise<MealPlanDay[]> {
+  const model = client.getGenerativeModel({
+    model: 'gemini-2.5-pro',
+    systemInstruction: MEAL_PLAN_SYSTEM_PROMPT,
+  })
+
+  const userMessage = `Bana 7 günlük haftalık yemek planı oluştur.${
+    dietContext ? `\n${dietContext}` : ''
+  }`
+
+  const result = await model.generateContent(userMessage)
+  const rawText = result.response.text().trim()
+  return parseMealPlanJson(rawText)
+}
+
+export async function generateSingleMeal(
+  day: string,
+  mealType: 'breakfast' | 'dinner',
+  dietContext?: string
+): Promise<MealItem> {
+  const model = client.getGenerativeModel({
+    model: 'gemini-2.5-pro',
+    systemInstruction: SINGLE_MEAL_SYSTEM_PROMPT,
+  })
+
+  const mealLabel = mealType === 'breakfast' ? 'kahvaltı' : 'akşam yemeği'
+  const userMessage = `${day} günü için ${mealLabel} tarifi öner.${
+    dietContext ? `\n${dietContext}` : ''
+  }`
+
+  const result = await model.generateContent(userMessage)
+  const rawText = result.response.text().trim()
+  return parseMealItemJson(rawText)
 }
 
 export async function analyzeIngredients(

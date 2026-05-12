@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { LogoutButton } from './logout-button'
 
 const links = [
-  { href: '/dashboard', label: 'Ana Sayfa', icon: '🏠' },
-  { href: '/pantry',    label: 'Kilerim',   icon: '🥦' },
-  { href: '/recipes',   label: 'Tariflerim', icon: '📋' },
-  { href: '/profile',   label: 'Profil',    icon: '👤' },
+  { href: '/dashboard', label: 'Ana Sayfa',   icon: '🏠' },
+  { href: '/pantry',    label: 'Kilerim',     icon: '🥦' },
+  { href: '/recipes',   label: 'Tariflerim',  icon: '📋' },
+  { href: '/meal-plan', label: 'Yemek Planı', icon: '🗓️' },
+  { href: '/profile',   label: 'Profil',      icon: '👤' },
 ]
 
 export function MobileNav() {

@@ -4,8 +4,8 @@
 
 ## 📍 Şu an neredeyiz?
 
-**Aktif Faz:** V2 — TAMAMLANDI 🎉  
-**Aktif Mikro-Adım:** Sonraki: V3 — Kişiselleştirilmiş öneriler + davranış öğrenme  
+**Aktif Faz:** V3 — App'i Canlandırma (başlamadı)  
+**Aktif Mikro-Adım:** Sonraki: V3.1 — Tarif Görselleri (Unsplash API)  
 **Son güncelleme:** 12 Mayıs 2026  
 **Canlı URL:** https://chef-ai-puce-zeta.vercel.app
 
@@ -109,6 +109,43 @@
 - [x] Haftalık yemek planı oluşturma ✅
 - [x] Kalori tahmini — makrolar tarif ve plan öğünlerinde gösteriliyor ✅
 
+---
+
+## 🚀 V3 — App'i Canlandırma
+
+> V3 amacı: V2'nin temel özellikleri üzerine görsel zenginlik, etkileşim ve keyif katmanları eklemek.
+
+### V3.1 — Tarif Görselleri
+- [ ] **D1** — `lib/unsplash.ts` wrapper (Unsplash API, tarif adına göre fotoğraf çek)
+- [ ] **D2** — Tarif kartları, public tarif sayfası, haftalık plan accordion'larına görsel entegrasyonu
+
+### V3.2 — Dark Mode + Animasyonlar
+- [ ] **E1** — Theme toggle (light/dark) + localStorage persistence
+- [ ] **E2** — `globals.css`'te dark mode CSS variables
+- [ ] **E3** — Framer Motion ile sayfa geçişleri ve kart animasyonları
+
+### V3.3 — Adım Adım Pişirme Modu
+- [ ] **F1** — Public tarif sayfasına "👨‍🍳 Pişirmeye Başla" butonu
+- [ ] **F2** — Full-screen step-by-step mod (tek adım, ileri/geri)
+- [ ] **F3** — Zamanlayıcı entegrasyonu (tarifteki dakikaları algıla)
+
+### V3.4 — Alışveriş Listesi
+- [ ] **G1** — Haftalık plandan otomatik market listesi üretme + pantry çıkarma
+- [ ] **G2** — `/shopping-list` sayfası + paylaşılabilir link
+
+### V3.5 — Tarif Sohbeti
+- [ ] **H1** — Tarif altına "Bu tarifi şöyle değiştir" input'u
+- [ ] **H2** — Gemini'ye context ile yeniden gönderme ("daha az kalorili", "vejetaryen yap" vb.)
+- [ ] **H3** — Yeni varyant olarak kaydetme seçeneği
+
+### V3.6 — Tüketim Takibi + Haftalık Özet
+- [ ] **I1** — Supabase `meals_eaten` tablosu + RLS
+- [ ] **I2** — "Yedim ✓" butonu (tarif kartı ve plan öğününde)
+- [ ] **I3** — Günlük tüketim özeti
+- [ ] **I4** — Haftalık özet sayfası (toplam kalori, makro dağılımı, en çok yenen tarifler)
+
+---
+
 ## 🎯 Önemli Kararlar (kronolojik)
 
 - **26 Nis 2026:** Stack: Next.js 14 + Tailwind v3 + TypeScript + Framer Motion + Supabase + Claude API + Gemini API. (16 + v4 yerine, daha bol kaynak için.)
@@ -126,11 +163,18 @@
 
 Yeni bir Claude Code konuşması açtığında şunu yapıştır:
 
-> Chef-AI projesindeyim, V2 tamamlandı. CLAUDE.md ve PROGRESS.md'yi oku, iki cümleyle özetle: nerede kaldık, V3 için sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
+> Chef-AI V3 projesindeyim. CLAUDE.md ve PROGRESS.md'yi oku, iki cümleyle özetle: nerede kaldık, sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
 
 ## 📝 Seans Notları
 
-### 12 Mayıs 2026 — V2.3 tamamlandı — V2 COMPLETE 🎉
+### 12 Mayıs 2026 — V3 yol haritası planlandı — V2 TAMAMLANDI 🎉
+- V2.1 diyet hedefleri tamamlandı (profil sayfası, dashboard kartları)
+- V2.2 paylaşılabilir tarif kartları (link + public sayfa + geçmiş)
+- V2.3 haftalık yemek planı (Gemini üretim + öğün yenileme + dashboard widget)
+- Tarif üretimi Claude API'den Gemini API'ye taşındı (maliyet optimizasyonu)
+- V3 yol haritası 6 başlıkta planlandı (V3.1–V3.6)
+
+### 12 Mayıs 2026 — V2.3 tamamlandı
 - `types/meal-plan.ts`: `MealItem`, `MealPlanDay`, `MealPlan` tipleri
 - `lib/ai/gemini.ts`: `generateWeeklyMealPlan(dietContext?)` + `generateSingleMeal(day, mealType, dietContext?)` eklendi
 - `POST /api/meal-plan/generate`: auth + profil + Gemini + UPSERT, hata detayı response'a eklendi

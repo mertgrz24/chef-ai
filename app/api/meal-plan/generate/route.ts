@@ -72,14 +72,18 @@ export async function POST() {
 
     if (dbError) {
       console.error('[/api/meal-plan/generate] DB hatası:', dbError)
-      return NextResponse.json({ error: 'Plan kaydedilemedi.' }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Plan kaydedilemedi.', detail: dbError.message },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ plan: data }, { status: 201 })
   } catch (err) {
-    console.error('[/api/meal-plan/generate] Haftalık plan üretme hatası:', err)
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[/api/meal-plan/generate] Haftalık plan üretme hatası:', message)
     return NextResponse.json(
-      { error: 'Yemek planı üretilemedi. Lütfen tekrar deneyin.' },
+      { error: 'Yemek planı üretilemedi. Lütfen tekrar deneyin.', detail: message },
       { status: 500 }
     )
   }

@@ -205,9 +205,18 @@ export async function generateWeeklyMealPlan(dietContext?: string): Promise<Meal
     dietContext ? `\n${dietContext}` : ''
   }`
 
+  console.log('[gemini] generateWeeklyMealPlan başlatılıyor...')
   const result = await model.generateContent(userMessage)
   const rawText = result.response.text().trim()
-  return parseMealPlanJson(rawText)
+  console.log('[gemini] generateWeeklyMealPlan ham yanıt (ilk 300 char):', rawText.slice(0, 300))
+
+  try {
+    return parseMealPlanJson(rawText)
+  } catch (parseErr) {
+    console.error('[gemini] generateWeeklyMealPlan JSON parse hatası:', parseErr)
+    console.error('[gemini] Ham yanıt (tam):', rawText)
+    throw parseErr
+  }
 }
 
 export async function generateSingleMeal(

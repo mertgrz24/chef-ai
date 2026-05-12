@@ -4,8 +4,8 @@
 
 ## 📍 Şu an neredeyiz?
 
-**Aktif Faz:** V2.3 — Haftalık Yemek Planı ✅ TAMAMLANDI  
-**Aktif Mikro-Adım:** Sonraki: V2.4 — (belirlenecek)  
+**Aktif Faz:** V2 — TAMAMLANDI 🎉  
+**Aktif Mikro-Adım:** Sonraki: V3 — Kişiselleştirilmiş öneriler + davranış öğrenme  
 **Son güncelleme:** 12 Mayıs 2026  
 **Canlı URL:** https://chef-ai-puce-zeta.vercel.app
 
@@ -88,7 +88,7 @@
   - `app/recipe/[id]/page.tsx`: public sayfa, auth yok, malzeme+adım+makro, "Sen de dene →" CTA
   - `dashboard/page.tsx`: "Geçmiş Tariflerim" son 5 tarif listesi, "Kayıtlı tarif" stat gerçek sayı
 
-### V2.3 — Haftalık Yemek Planı (Aktif)
+### V2.3 — Haftalık Yemek Planı ✅ TAMAMLANDI
 - [x] **C1** — `meal_plans` Supabase tablosu (id, user_id, week_start_date, meals jsonb, created_at, updated_at) + RLS + unique(user_id, week_start_date) ✅
 - [x] **C2** — API endpoint'leri ✅
   - `types/meal-plan.ts` — `MealItem`, `MealPlanDay`, `MealPlan` tipleri
@@ -104,10 +104,10 @@
   - `app/(dashboard)/dashboard/page.tsx`: "Bu Haftaki Planın" widget'ı — bugünün kahvaltı+akşam öğünü, plan yoksa "oluştur →" linki
   - typecheck: 0 hata · lint: 0 hata
 
-### V2 Kapsam (Genel)
+### V2 Kapsam (Genel) ✅ TAMAMLANDI 🎉
 - [x] Paylaşılabilir tarif kartları (viral mekanizma) ✅
-- [ ] Haftalık yemek planı oluşturma
-- [ ] Kalori tahmini (Claude ile)
+- [x] Haftalık yemek planı oluşturma ✅
+- [x] Kalori tahmini — makrolar tarif ve plan öğünlerinde gösteriliyor ✅
 
 ## 🎯 Önemli Kararlar (kronolojik)
 
@@ -126,9 +126,20 @@
 
 Yeni bir Claude Code konuşması açtığında şunu yapıştır:
 
-> Chef-AI V2 projesindeyim. CLAUDE.md ve PROGRESS.md'yi oku, iki cümleyle özetle: nerede kaldık, sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
+> Chef-AI projesindeyim, V2 tamamlandı. CLAUDE.md ve PROGRESS.md'yi oku, iki cümleyle özetle: nerede kaldık, V3 için sıradaki mikro-adım ne? Mikro-adım modunda kal, Türkçe konuş.
 
 ## 📝 Seans Notları
+
+### 12 Mayıs 2026 — V2.3 tamamlandı — V2 COMPLETE 🎉
+- `types/meal-plan.ts`: `MealItem`, `MealPlanDay`, `MealPlan` tipleri
+- `lib/ai/gemini.ts`: `generateWeeklyMealPlan(dietContext?)` + `generateSingleMeal(day, mealType, dietContext?)` eklendi
+- `POST /api/meal-plan/generate`: auth + profil + Gemini + UPSERT, hata detayı response'a eklendi
+- `GET /api/meal-plan`: bu haftanın planı, 200/404
+- `PATCH /api/meal-plan/regenerate-day`: tek öğün yenileme, body validasyonu
+- `app/(dashboard)/meal-plan/page.tsx`: boş durum + oluştur butonu + 7 günlük liste + accordion detay + tek öğün yenile + tüm planı yenile
+- Sidebar ve mobil nav'a "🗓️ Yemek Planı" eklendi
+- Dashboard'a "Bu Haftaki Planın" widget'ı (bugünün öğünleri)
+- Bug fix: `regenMeal` surgical state update, `finally` bloğu, hata mesajı gösterimi
 
 ### 11 Mayıs 2026 — V2.2 B3 tamamlandı — V2.2 COMPLETE
 - `components/dashboard/recipe-generator.tsx`: `parseFormattedRecipe` helper; `parsedRecipe`, `savedRecipeId`, `saving`, `shareMessage`, `saveError` state; `handleSave` → POST /api/recipes/save; `triggerShare` → Web Share API önce, `AbortError` ignore, clipboard fallback; "🔗 Tekrar Paylaş" idempotent

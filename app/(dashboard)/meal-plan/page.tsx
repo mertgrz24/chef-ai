@@ -68,20 +68,50 @@ export default function MealPlanPage() {
   async function regenMeal(day: string, meal: 'breakfast' | 'dinner') {
     const key = `${day}-${meal}`
     setRegenKey(key)
+    setError(null)
     try {
       const res = await fetch('/api/meal-plan/regenerate-day', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ day, meal }),
       })
-      if (res.ok) {
-        const data = (await res.json()) as { plan: MealPlan }
-        setPlan(data.plan)
+
+      const data = (await res.json()) as { plan?: MealPlan; error?: string; detail?: string }
+      console.log('[regenMeal] yanıt:', res.status, data)
+
+      if (!res.ok) {
+        setError(data.error ?? 'Öğün yenilenemedi. Lütfen tekrar deneyin.')
+        return
       }
-    } catch {
-      // keep existing meal on failure
+
+      if (!data.plan) {
+        setError('Öğün yenilenemedi: API boş yanıt döndürdü.')
+        return
+      }
+
+      // Surgical update — only patch the one meal, leave other days untouched
+      const newMealItem = data.plan.meals.find((d) => d.day === day)?.[meal]
+      if (newMealItem) {
+        setPlan((prev) =>
+          prev
+            ? {
+                ...prev,
+                meals: prev.meals.map((d) =>
+                  d.day === day ? { ...d, [meal]: newMealItem } : d
+                ),
+              }
+            : prev
+        )
+      } else {
+        // Fallback: replace whole plan if we can't isolate the meal
+        setPlan(data.plan ?? null)
+      }
+    } catch (err) {
+      console.error('[regenMeal] fetch hatası:', err)
+      setError('Öğün yenilenemedi. Lütfen tekrar deneyin.')
+    } finally {
+      setRegenKey(null)
     }
-    setRegenKey(null)
   }
 
   function toggleExpand(key: string) {
